@@ -42,6 +42,23 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            // Handle back button press
+            Navigator.pop(context);
+          },
+        ),
+        // title: Row(
+        //   children: [
+        //     const Text(
+        //       "Buddy",
+        //       style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+        //     ),
+        //   ],
+        // ),
+      ),
       body: _isLoading
           ? Center(
           child: CircularProgressIndicator(
@@ -49,13 +66,14 @@ class _RegisterPageState extends State<RegisterPage> {
           : SingleChildScrollView(
         child: Padding(
           padding:
-          const EdgeInsets.symmetric(horizontal: 20, vertical: 80),
+          const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
           child: Form(
               key: formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
+
                   const Text(
                     "Buddy",
                     style: TextStyle(

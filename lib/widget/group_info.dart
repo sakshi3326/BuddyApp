@@ -32,7 +32,7 @@ class GroupInfo extends StatefulWidget {
 }
 
 class _GroupInfoState extends State<GroupInfo> {
-  Stream? members;
+  List<String> members = [];
 
   @override
   void initState() {
@@ -41,22 +41,38 @@ class _GroupInfoState extends State<GroupInfo> {
   }
 
   getMembers() async {
-    DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-        .getGroupMembers(widget.groupId)
-        .then((val) {
-      setState(() {
-        members = val;
-      });
+    List<String> membersList = await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .getGroupMembers(widget.groupId);
+
+    List<String> userIds = membersList.map((member) => getId(member)).toList();
+
+    List<String> fullNames = await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .getFullNamesByUserIds(userIds);
+
+    print("Full Names List: $fullNames"); // Add this line to check the fullNames list
+
+    setState(() {
+      members = fullNames;
     });
   }
+
+
 
   String getName(String r) {
     return r.substring(r.indexOf("_") + 1);
   }
 
   String getId(String res) {
-    return res.substring(0, res.indexOf("_"));
+    int underscoreIndex = res.indexOf("_");
+    if (underscoreIndex != -1 && underscoreIndex < res.length - 1) {
+      return res.substring(0, underscoreIndex);
+    } else {
+      // Handle the case where the format is not as expected
+      print('Invalid format: $res');
+      return res; // or return an empty string, or handle as needed
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -120,152 +136,103 @@ class _GroupInfoState extends State<GroupInfo> {
         //   ),
         // ],
       ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Row for Group Name
-            Row(
-              children: [
-                Text(
-                  "Group Name: ${widget.groupName}",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Row for Group Name
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "Group Name: ${widget.groupName}",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
 
-            // Row for Start Date and Due Date
-            Row(
-              children: [
-                Text("Start Date: ${widget.startDate}"),
-                const SizedBox(width: 20),
+              // Row for Start Date and Due Date
+              Row(
+                children: [
+                  Text("Start Date: ${widget.startDate}"),
 
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Text("Due Date: ${widget.dueDate}"),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Text("Stage: ${widget.stage}"),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Text("Owner: ${widget.owner}"),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Text("Description: ${widget.desc}"),
-              ],
-            ),
-            // Admin Tile
-            // Container(
-            //   padding: const EdgeInsets.all(20),
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(30),
-            //     color: Theme.of(context).primaryColor.withOpacity(0.2),
-            //   ),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.start,
-            //     children: [
-            //       CircleAvatar(
-            //         radius: 30,
-            //         backgroundColor: Theme.of(context).primaryColor,
-            //         child: Text(
-            //           widget.groupName.substring(0, 1).toUpperCase(),
-            //           style: const TextStyle(
-            //             fontWeight: FontWeight.w500,
-            //             color: Colors.white,
-            //           ),
-            //         ),
-            //       ),
-            //       const SizedBox(width: 20),
-            //       // Column(
-            //       //   crossAxisAlignment: CrossAxisAlignment.start,
-            //       //   children: [
-            //       //     Text(
-            //       //       "Group: ${widget.groupName}",
-            //       //       style: const TextStyle(fontWeight: FontWeight.w500),
-            //       //     ),
-            //       //     const SizedBox(height: 5),
-            //       //     Text("Admin: ${getName(widget.adminName)}"),
-            //       //   ],
-            //       // ),
-            //     ],
-            //   ),
-            // ),
-            const SizedBox(height: 20),
 
-            // Member List
-            // memberList(),
-          ],
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Text("Due Date: ${widget.dueDate}"),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Text("Stage: ${widget.stage}"),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Text("Owner: ${widget.owner}"),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(child: Text("Description: ${widget.desc}")),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // Member List
+              memberList(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // memberList() {
-  //   return StreamBuilder(
-  //     stream: members,
-  //     builder: (context, AsyncSnapshot snapshot) {
-  //       if (snapshot.hasData) {
-  //         if (snapshot.data['members'] != null) {
-  //           if (snapshot.data['members'].length != 0) {
-  //             return ListView.builder(
-  //               itemCount: snapshot.data['members'].length,
-  //               shrinkWrap: true,
-  //               itemBuilder: (context, index) {
-  //                 return Container(
-  //                   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-  //                   child: ListTile(
-  //                     leading: CircleAvatar(
-  //                       radius: 30,
-  //                       backgroundColor: Theme.of(context).primaryColor,
-  //                       child: Text(
-  //                         getName(snapshot.data['members'][index])
-  //                             .substring(0, 1)
-  //                             .toUpperCase(),
-  //                         style: const TextStyle(
-  //                           color: Colors.white,
-  //                           fontSize: 15,
-  //                           fontWeight: FontWeight.bold,
-  //                         ),
-  //                       ),
-  //                     ),
-  //                     title: Text((snapshot.data['members'][index])),
-  //
-  //                   ),
-  //                 );
-  //               },
-  //             );
-  //           } else {
-  //             return const Center(
-  //               child: Text("NO MEMBERS"),
-  //             );
-  //           }
-  //         } else {
-  //           return const Center(
-  //             child: Text("NO MEMBERS"),
-  //           );
-  //         }
-  //       } else {
-  //         return Center(
-  //           child: CircularProgressIndicator(
-  //             color: Theme.of(context).primaryColor,
-  //           ),
-  //         );
-  //       }
-  //     },
-  //   );
-  // }
+  memberList() {
+    if (members.isNotEmpty) {
+      return ListView.builder(
+        itemCount: members.length,
+        shrinkWrap: true,
+        itemBuilder: (context, index) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 30,
+                backgroundColor: Theme.of(context).primaryColor,
+                child: Text(
+                  getId(members[index])
+                      .substring(0, 1)
+                      .toUpperCase(),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              title: Text(members[index]),
+
+            ),
+          );
+        },
+      );
+    } else {
+      return const Center(
+        child: Text("NO MEMBERS"),
+      );
+    }
+  }
+
+
 }

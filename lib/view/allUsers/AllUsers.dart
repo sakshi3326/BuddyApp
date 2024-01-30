@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:task/view/home/home_view.dart';
+import 'package:task/view/upcoming_task/widget/upcoming_schedule_list.dart';
 
 import '../../helper/helper_function.dart';
 import '../../service/database_service.dart';
 import '../../widget/widgets.dart';
+import '../bottom_bar/bottom_nav_bar_for_task/bottom_nav_for_task.dart';
 import '../signup/register.dart';
 
 class AllUsers extends StatefulWidget {
@@ -48,7 +51,15 @@ class _AllUsersState extends State<AllUsers> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                const BottomNavigationForTaskView(
+                  selectedIndex: 0,
+                  message: '',
+                ),
+              ),
+            );
           },
         ),
       ),

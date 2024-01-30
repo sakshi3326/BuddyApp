@@ -5,6 +5,9 @@ import 'package:task/utils/text_style.dart';
 import 'package:task/view/upcoming_task/widget/upcoming_schedule_list.dart';
 import 'package:task/widget/app_bar/app_bar.dart';
 
+import '../bottom_bar/bottom_nav_bar_for_task/bottom_nav_for_task.dart';
+import '../home/home_view.dart';
+
 class UpcomingTaskView extends StatefulWidget {
   const UpcomingTaskView({Key? key}) : super(key: key);
 
@@ -17,8 +20,22 @@ class _UpcomingTaskViewState extends State<UpcomingTaskView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CommonColors.whiteColor,
-      appBar: AppBarView(
-        title: "Projects",
+      appBar: AppBar(
+        title: Text("Projects"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                const BottomNavigationForTaskView(
+                  selectedIndex: 0,
+                  message: '',
+                ),
+              ),
+            );
+          },
+        ),
 
 
       ),

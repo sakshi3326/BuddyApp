@@ -7,6 +7,7 @@ import 'package:task/utils/common_colors.dart';
 import 'package:task/utils/text_style.dart';
 import 'package:task/view/home/widget/task_list_view.dart';
 import 'package:task/view/task_details/task_details_view.dart';
+import 'package:task/view/welcome/welcome_view.dart';
 import 'package:task/widget/app_bar/app_bar.dart';
 
 import '../../helper/helper_function.dart';
@@ -242,8 +243,17 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CommonColors.whiteColor,
-      appBar: AppBarView(
-        title: "Create Task",
+      appBar: AppBar(
+        title: Text("Create Task"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => WelComeView()),
+            );
+          },
+        ),
 
       ),
       body: SingleChildScrollView(

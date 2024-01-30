@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helper/helper_function.dart';
 import '../../widget/widgets.dart';
+import '../bottom_bar/bottom_nav_bar_for_task/bottom_nav_for_task.dart';
 import '../home/home_view.dart';
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -82,12 +83,22 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CommonColors.whiteColor,
-      appBar: AppBarView(
-        title: "Profile",
-        firstIcon: Icons.category_outlined,
-        onBackPress: () {
-          Navigator.pop(context);
-        },
+      appBar: AppBar(
+        title: Text("Profile"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                const BottomNavigationForTaskView(
+                  selectedIndex: 0,
+                  message: '',
+                ),
+              ),
+            );
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Container(

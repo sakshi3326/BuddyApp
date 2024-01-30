@@ -92,6 +92,16 @@ class DatabaseService {
       throw error;
     }
   }
+  Future<List<String>> getFullNamesByUserIds(List<String> userIds) async {
+    try {
+      QuerySnapshot snapshot = await userCollection.where("uid", whereIn: userIds).get();
+      List<String> fullNames = snapshot.docs.map((doc) => doc['fullName'] as String).toList();
+      return fullNames;
+    } catch (e) {
+      print("Error getting full names by IDs: $e");
+      return [];
+    }
+  }
 
 
   // Update user information in the database
@@ -202,7 +212,7 @@ class DatabaseService {
       "owner": owner,
       "desc": desc,
       "groupIcon": "",
-      "admin": "${id}_$userName",
+      "admin": "${id}",
       "members": [],
       "groupId": "",
       "recentMessage": "",
@@ -212,7 +222,7 @@ class DatabaseService {
 
     // update the members
     await groupDocumentReference.update({
-      "members": FieldValue.arrayUnion(["${uid}_$userName"]),
+      "members": FieldValue.arrayUnion(["${uid}"]),
       "groupId": groupDocumentReference.id,
     });
 
@@ -293,16 +303,35 @@ class DatabaseService {
   }
 
   // get group members
-  getGroupMembers(String groupId) {
-    return groupCollection.doc(groupId).snapshots().map((snapshot) {
+  Future<List<String>> getGroupMembers(String groupId) async {
+    try {
+      DocumentSnapshot snapshot = await groupCollection.doc(groupId).get();
+
       if (snapshot.exists) {
         List<dynamic> members = snapshot['members'] ?? [];
         return members.cast<String>().toList();
       } else {
         return [];
       }
-    });
+    } catch (error) {
+      print("Error fetching group members: $error");
+      return [];
+    }
   }
+
+
+  // Add a method in your DatabaseService to fetch emails based on user IDs
+  Future<List<String>?> getAllEmailsByIds(List<String> ids) async {
+    try {
+      QuerySnapshot snapshot = await userCollection.where("uid", whereIn: ids).get();
+      List<String> emails = snapshot.docs.map((doc) => doc['email'] as String).toList();
+      return emails;
+    } catch (e) {
+      print("Error getting emails by IDs: $e");
+      return null;
+    }
+  }
+
 
   // get task members
   getTaskMembers(String taskId) {

@@ -1,4 +1,4 @@
-package com.example.task;
+package com.rpadg.buddy;
 
 import io.flutter.embedding.android.FlutterActivity;
 
